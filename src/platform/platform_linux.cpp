@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2020 Canonical, Ltd.
+ * Copyright (C) 2017-2021 Canonical, Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 
 #include <multipass/constants.h>
 #include <multipass/exceptions/autostart_setup_exception.h>
-#include <multipass/exceptions/not_implemented_on_this_backend_exception.h>
 #include <multipass/exceptions/settings_exceptions.h>
 #include <multipass/exceptions/snap_environment_exception.h>
 #include <multipass/format.h>
@@ -174,9 +173,25 @@ bool mp::platform::is_image_url_supported()
     return true;
 }
 
+namespace
+{
+mp::NetworkInterfaceInfo get_network(const QString& name)
+{
+    return {name.toStdString(), "", ""};
+}
+} // namespace
+
 std::map<std::string, mp::NetworkInterfaceInfo> mp::platform::get_network_interfaces_info()
 {
-    throw mp::NotImplementedOnThisBackendException("get_network_interfaces_info");
+    auto ifaces_info = std::map<std::string, mp::NetworkInterfaceInfo>();
+    for (const auto& entry : QDir{QStringLiteral("/sys/class/net")}.entryList(QDir::NoDotAndDotDot | QDir::Dirs))
+    {
+        auto iface = get_network(entry);
+        auto name = iface.id; // (can't rely on param evaluation order)
+        ifaces_info.emplace(std::move(name), std::move(iface));
+    }
+
+    return ifaces_info;
 }
 
 std::string mp::platform::reinterpret_interface_id(const std::string& ux_id)
