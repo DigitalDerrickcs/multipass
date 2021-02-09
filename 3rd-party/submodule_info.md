@@ -17,7 +17,7 @@ Version: 0.9.3 (+[our patches](https://github.com/CanonicalLtd/libssh/compare/li
 <https://www.libssh.org/>
 
 ### fmt
-Version: 7.0.2 |
+Version: 7.1.3 |
 <https://github.com/fmtlib/fmt.git> |
 <https://github.com/fmtlib/fmt/releases>
 
